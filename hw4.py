@@ -26,6 +26,7 @@ def print_msg(msg, msgtype):
 
 def init():
     print("=======================================================================================")
+    print('     RSSHEX v1.3')
     print('     === SSH PRIV. Escilation to root with SUDO Account and Write Permissions to SSH Config ===')
     print_msg("WELCOME! This program is for educational use only on authorized equipment!, by continuing you agree to these terms", "INIT")
     print_msg("Created by Kenyon Litt, for CSEC 473", "INIT")
@@ -226,3 +227,5 @@ def main():
 if __name__ == '__main__':
     init()
     main()
+    
+    
