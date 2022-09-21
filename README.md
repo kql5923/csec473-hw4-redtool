@@ -5,6 +5,8 @@
 <h2 style="text-align:left;"><span style="float:center;">RSSHEX (Root SSH Exploit) </span>
 </h2>
 
+**Author: Kenyon Litt**
+
 ## Purpose
 According to the CIS ubuntu linux LTS benchmark, important files critical to system operation should be kept as root ownership for read/write with no other users able to access them. An example of these important files would be /etc/shadow (encrypted password data) and /etc/passwd (user access, and information data). Another important system hardening technique is to always disable root access, as that account has authorization for the entire system. Despite these recommendations, if a sudo’d user can change the file permissions (by accident or on purpose) of shadow and passwd, privilege escalation can occur into the root account, through the SSH config and service. As demonstrated manually, this process essentially happens as a user can remove the password for a user account, remove the ability in ssh for passwords to be required and to remove the protection of root access through ssh (even if its disabled for the system). This script automates and tests for permission and configuration vulnerabilities with ssh and file permissions and can present a root shell to the user on the system via any new (or existing) user account. If this script is successful, it can not only be used for further leverage, but also provide a good metric to configuration security if these options are enabled (aka if this works, other configs or services may be vulnerable due to bad parameters ). 
 ## Requirements
